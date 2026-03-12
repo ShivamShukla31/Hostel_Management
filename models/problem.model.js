@@ -70,7 +70,6 @@ problemSchema.pre("save", function(next) {
     if (!this.tokenId) {
         this.tokenId = generateTicketId();
     }
-    next();
 });
 const Problem = mongoose.model("Problem", problemSchema);
 // 3️⃣ Export model

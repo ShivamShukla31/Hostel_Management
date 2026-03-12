@@ -1,7 +1,7 @@
 // middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/users.model.js";
-
+import {ApiError} from "../utils/Api_Error.js";
 export const protect = async (req, res, next) => {
     try {
         let token;
@@ -14,7 +14,7 @@ export const protect = async (req, res, next) => {
         }
 
         if (!token) {
-            return res.status(401).json({ message: "Not authorized, no token" });
+            return new ApiError("Not authorized, no token", 401);
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -22,7 +22,7 @@ export const protect = async (req, res, next) => {
         const user = await User.findById(decoded.id).select("-password");
 
         if (!user) {
-            return res.status(401).json({ message: "User not found" });
+            return new ApiError("User not found", 404);
         }
 
         req.user = user;
@@ -31,9 +31,9 @@ export const protect = async (req, res, next) => {
 
     } catch (error) {
         if (error.name === "TokenExpiredError") {
-            return res.status(401).json({ message: "Token expired" });
+            return new ApiError("Token expired", 401);
         }
 
-        return res.status(401).json({ message: "Invalid token" });
+        return new ApiError("Invalid token", 401);
     }
 };

@@ -1,10 +1,9 @@
 // middleware/roleMiddleware.js
+import {ApiError} from "../utils/Api_Error.js";
 export const authorizeRoles = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {
-            return res.status(403).json({
-                message: `Role ${req.user.role} is not allowed`
-            });
+            return new ApiError("Forbidden: You don't have permission to access this resource", 403);
         }
         next();
     };

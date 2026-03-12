@@ -1,7 +1,7 @@
 import {Problem} from "../models/problem.model.js";
 import { allowedTransitions } from "../utils/statusTransition.js";
 import {asyncHandler} from "./asyncHandler.js";
-
+import {ApiError} from "../utils/Api_Error.js";
 
 export const validateStatusTransition = asyncHandler(async (req, res, next) => {
 
@@ -10,8 +10,7 @@ export const validateStatusTransition = asyncHandler(async (req, res, next) => {
     const problem = await Problem.findById(req.params.id);
 
     if (!problem) {
-        res.status(404);
-        throw new Error("Problem not found");
+        throw new ApiError("Problem not found", 404);
     }
 
     const currentStatus = problem.status;
@@ -19,10 +18,7 @@ export const validateStatusTransition = asyncHandler(async (req, res, next) => {
     const allowed = allowedTransitions[currentStatus];
 
     if (!allowed.includes(newStatus)) {
-        res.status(400);
-        throw new Error(
-            `Cannot change status from ${currentStatus} to ${newStatus}`
-        );
+        throw new ApiError(`Invalid status transition from ${currentStatus} to ${newStatus}`, 400);
     }
 
     req.problem = problem; // attach for next controller

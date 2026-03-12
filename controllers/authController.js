@@ -3,6 +3,7 @@ import User from "../models/users.model.js";
 import bcrypt from "bcryptjs";
 import {asyncHandler} from "../middleware/asyncHandler.js";
 import generateToken from "../utils/generateToken.js";
+import {ApiError} from "../utils/Api_Error.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -10,8 +11,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-        res.status(400);
-        throw new Error("User already exists");
+        return new ApiError("User already exists", 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,7 +46,7 @@ export const loginUser = asyncHandler(async (req, res) => {
             token: generateToken(user._id)
         });
     } else {
-        res.status(401);
-        throw new Error("Invalid email or password");
+        return new ApiError("Invalid email or password", 401);
     }
 });
+

@@ -4,13 +4,17 @@ import {
   getMyProblems,
   getAllProblems,
   updateStatus,
-  assignWorker
+  assignWorker,
+  getDashboardStats,
+  getIssueStats,
+  profile
 } from "../controllers/problemController.js";
 
 import { protect } from "../middleware/auth.Middleware.js";
 import { authorizeRoles } from "../middleware/role.Middleware.js";
 import { upload } from "../middleware/imageUploader.Middleware.js";
 import { validateStatusTransition } from "../middleware/validateStatusTransition.js";
+import { get } from "mongoose";
 
 const router = express.Router();
 
@@ -36,6 +40,27 @@ router.get(
   authorizeRoles("Student"),
   getMyProblems
 );
+
+router.get(
+  "/profile",
+  protect,
+  authorizeRoles("Student", "Worker", "Rector", "Warden"),
+  profile
+);
+
+router.get(
+  "/dashboard",
+  protect,
+  authorizeRoles("Student"),
+  getDashboardStats
+);
+
+router.get(
+  "/issue_stats",
+  protect,
+  authorizeRoles("Student"),
+  getIssueStats
+)
 
 /*
 -----------------------------------------
